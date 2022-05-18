@@ -5,18 +5,6 @@ Created on Mon May 16 09:30:16 2022
 @author: ojasw
 """
 
-'''
-From wigner3j symbols which must follow
-|l1 l2 l3|
-|m  -m  0|
-with m=0,2 only, we must calculate 3j for
-any m1,m2,m3 desired.
-
-https://github.com/LorneWhiteway/UCLWig3j
-
-Created by: Joao Alberto
-'''
-
 import numpy as np
 import scipy
 from sympy.physics.wigner import wigner_3j
