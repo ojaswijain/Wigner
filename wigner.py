@@ -6,8 +6,6 @@ Created on Mon May 16 09:30:16 2022
 """
 
 import numpy as np
-import scipy
-from sympy.physics.wigner import wigner_3j
 import pipeline
 
 
@@ -238,11 +236,7 @@ def recursion_3(wigner3j, previous_sign=0):
 		coeffs = recursion_coeffs(wigner3j, 1, sign)
 		
 		
-	else:#elif False and (abs(wigner3j[1][2]) < abs(wigner3j[1][2]) or
-		  #sign3==previous_sign):
-		  
-		#
-		
+	else:		
 		sign = sign3
 		
 		wigner1 = np.array(
@@ -519,7 +513,7 @@ if __name__=="__main__":
 		
 	#wigner0 = np.array([[9,10,5],[-4,7,-3]])
 	#wigner0 = np.array([[9,10,5],[1,0,-1]])
-	wigner0 = np.array([[5,4,3],[-4,3,1]])
+	wigner0 = np.array([[120,130,140],[-4,3,1]])
 	#wigner0 = np.array([[100,99,3],[-100,98,2]])
 	#wigner0 = np.array([[100,99,19],[-8,4,4]])
 	#wigner0 = np.array([[100,99,19],[-,1,2]])
@@ -533,14 +527,23 @@ if __name__=="__main__":
 	# ===========TO-OJASWI-1=========
 	# the known_3js must be modified to receive the 
 	# (l1,l2,l3,m1,m2,m3) and its respective value.
-	known_3js = [[list(wigner0[0]),[-2,0,2],pipeline.give_val_ana(wigner0[0],np.array([-2,0,2]))],
-				 [list(wigner0[0]),[-2,2,0],pipeline.give_val_ana(wigner0[0],np.array([-2,2,0]))],
-				 [list(wigner0[0]),[0,-2,2],pipeline.give_val_ana(wigner0[0],np.array([0,-2,2]))],
-				 [list(wigner0[0]),[0,0,0], pipeline.give_val_ana(wigner0[0],np.array([0,0,0]))],
-				 [list(wigner0[0]),[0,2,-2],pipeline.give_val_ana(wigner0[0],np.array([0,2,-2]))],
-				 [list(wigner0[0]),[2,-2,0],pipeline.give_val_ana(wigner0[0],np.array([2,-2,0]))],
-				 [list(wigner0[0]),[2,0,-2],pipeline.give_val_ana(wigner0[0],np.array([2,0,-2]))],
-				 [wigner0.tolist(), pipeline.give_val_ana(wigner0.tolist())]]
+
+	known_3js = [[list(wigner0[0]),[-1,0,1]],
+				 [list(wigner0[0]),[-1,1,0]],
+				 [list(wigner0[0]),[0,-1,1]],
+				 [list(wigner0[0]),[0,0,0]],
+				 [list(wigner0[0]),[0,1,-1]],
+				 [list(wigner0[0]),[1,-1,0]],
+				 [list(wigner0[0]),[1,0,-1]],
+				 wigner0.tolist()]
+	# known_3js = [[list(wigner0[0]),[-2,0,2],pipeline.give_val_ana(wigner0[0],np.array([-2,0,2]))],
+	# 			 [list(wigner0[0]),[-2,2,0],pipeline.give_val_ana(wigner0[0],np.array([-2,2,0]))],
+	# 			 [list(wigner0[0]),[0,-2,2],pipeline.give_val_ana(wigner0[0],np.array([0,-2,2]))],
+	# 			 [list(wigner0[0]),[0,0,0], pipeline.give_val_ana(wigner0[0],np.array([0,0,0]))],
+	# 			 [list(wigner0[0]),[0,2,-2],pipeline.give_val_ana(wigner0[0],np.array([0,2,-2]))],
+	# 			 [list(wigner0[0]),[2,-2,0],pipeline.give_val_ana(wigner0[0],np.array([2,-2,0]))],
+	# 			 [list(wigner0[0]),[2,0,-2],pipeline.give_val_ana(wigner0[0],np.array([2,0,-2]))],
+	# 			 [wigner0.tolist(), pipeline.give_val_ana(wigner0.tolist())]]
 				  
 				  # although wigner0 is not known yet,
 				  # it is part of the stop condition.

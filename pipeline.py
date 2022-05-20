@@ -8,6 +8,7 @@ Created on Fri May  6 09:30:16 2022
 import numpy as np
 import pickle as pkl
 import sys
+from multipledispatch import dispatch
 
 wigner_dict_ana={
     
@@ -17,6 +18,7 @@ wigner_dict_rec={
     
 }
 
+@dispatch(int, int, int, int, int, int, float)
 def store_val_ana(l1,l2,l3,m1,m2,m3, val):
     '''
     Calculate the key of the 
@@ -31,6 +33,7 @@ def store_val_ana(l1,l2,l3,m1,m2,m3, val):
         pkl.dump(wigner_dict_ana, handle, protocol=pkl.HIGHEST_PROTOCOL)
     return
 
+@dispatch(np.ndarray, float)
 def store_val_ana(arr1, val):
     '''
     Calculate the key of the 
@@ -46,6 +49,7 @@ def store_val_ana(arr1, val):
         pkl.dump(wigner_dict_ana, handle, protocol=pkl.HIGHEST_PROTOCOL)
     return
 
+@dispatch(np.ndarray, np.ndarray, float)
 def store_val_ana(l1, m1, val):
     '''
     Calculate the key of the 
@@ -62,6 +66,7 @@ def store_val_ana(l1, m1, val):
         pkl.dump(wigner_dict_ana, handle, protocol=pkl.HIGHEST_PROTOCOL)
     return  
 
+@dispatch(int, int, int, int, int, int)
 def give_val_ana(l1,l2,l3,m1,m2,m3):
     '''
     Calculate the key of the 
@@ -76,6 +81,7 @@ def give_val_ana(l1,l2,l3,m1,m2,m3):
 
     return wigner_dict_ana[idx1+idx2]
 
+@dispatch(np.ndarray)
 def give_val_ana(arr1):
     '''
     Calculate the key of the 
@@ -91,6 +97,7 @@ def give_val_ana(arr1):
 
     return wigner_dict_ana[idx1+idx2]
 
+@dispatch(np.ndarray, np.ndarray)
 def give_val_ana(l1, m1):
     '''
     Calculate the key of the 
@@ -107,7 +114,7 @@ def give_val_ana(l1, m1):
 
     return wigner_dict_ana[idx1+idx2]
 
-
+@dispatch(int, int, int, int, int, int, float)
 def store_val_rec(l1,l2,l3,m1,m2,m3,val):
     '''
     Calculate the key of the 
@@ -122,6 +129,7 @@ def store_val_rec(l1,l2,l3,m1,m2,m3,val):
         pkl.dump(wigner_dict_rec, handle, protocol=pkl.HIGHEST_PROTOCOL)
     return 
 
+@dispatch(np.ndarray, float)
 def store_val_rec(arr1,val):
     '''
     Calculate the key of the 
@@ -137,6 +145,7 @@ def store_val_rec(arr1,val):
         pkl.dump(wigner_dict_rec, handle, protocol=pkl.HIGHEST_PROTOCOL)
     return
 
+@dispatch(np.ndarray, np.ndarray, float)
 def store_val_rec(l1, m1,val):
     '''
     Calculate the key of the 
@@ -153,7 +162,7 @@ def store_val_rec(l1, m1,val):
         pkl.dump(wigner_dict_rec, handle, protocol=pkl.HIGHEST_PROTOCOL)
     return 
 
-
+@dispatch(int, int, int, int, int, int, int)
 def give_val_rec(l1,l2,l3,m1,m2,m3):
     '''
     Calculate the key of the 
@@ -168,6 +177,7 @@ def give_val_rec(l1,l2,l3,m1,m2,m3):
 
     return wigner_dict_rec[idx1+idx2]
 
+@dispatch(np.ndarray)
 def give_val_rec(arr1):
     '''
     Calculate the key of the 
@@ -183,6 +193,7 @@ def give_val_rec(arr1):
 
     return wigner_dict_rec[idx1+idx2]
 
+@dispatch(np.ndarray, np.ndarray)
 def give_val_rec(l1, m1):
     '''
     Calculate the key of the 
@@ -215,6 +226,9 @@ def main():
 
     if args[0]==2:
         give_val_ana(args[1],args[2],args[3],args[4],args[5],args[6])
+
+    else:
+        return
 
     if args[0]==3:
         give_val_rec(args[1],args[2],args[3],args[4],args[5],args[6])
