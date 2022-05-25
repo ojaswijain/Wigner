@@ -2,7 +2,7 @@
 """
 Created on Mon May 16 09:30:16 2022
 
-@author: ojasw
+@authors: joao alberto, ojasw
 """
 
 import numpy as np
@@ -32,20 +32,32 @@ def recursion_coeffs(wigner3j, m_idx, sign):
 	has been performed over it (+1 or -1).
 	'''
 	coeffs = [0,0,0]
-	k = 0
-	print(m_idx, sign)
-	for i in range(3):
-		if i!=m_idx:
-			coeffs[k] = np.sqrt((wigner3j[0][i]-sign*wigner3j[1][i]+1)*
-								(wigner3j[0][i]+sign*wigner3j[1][i]))
-			print("sqrt({}-{}*{}+1)({}+{}*{})".format(wigner3j[0][i],sign,wigner3j[1][i],
-											       wigner3j[0][i],sign,wigner3j[1][i]))
-			k=2				
-		else:
-			coeffs[1] = np.sqrt((wigner3j[0][i]+sign*wigner3j[1][i]+1)*
-								(wigner3j[0][i]-sign*wigner3j[1][i]))
-			print("sqrt({}+{}*{}+1)({}-{}*{})".format(wigner3j[0][i],sign,wigner3j[1][i],
-												wigner3j[0][i],sign,wigner3j[1][i]))	
+	if m_idx==0:
+		
+		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0]+1)*
+							(wigner3j[0][0]-sign*wigner3j[1][0]))
+		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1])*
+							(wigner3j[0][1]-sign*wigner3j[1][1]+1))
+		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2])*
+							(wigner3j[0][2]-sign*wigner3j[1][2]+1))
+	
+	elif m_idx==1:
+	
+		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0])*
+							(wigner3j[0][0]-sign*wigner3j[1][0]+1))
+		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1]+1)*
+							(wigner3j[0][1]-sign*wigner3j[1][1]))
+		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2])*
+							(wigner3j[0][2]-sign*wigner3j[1][2]+1))
+	
+	elif m_idx==2:
+	
+		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0])*
+							(wigner3j[0][0]-sign*wigner3j[1][0]+1))
+		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1])*
+							(wigner3j[0][1]-sign*wigner3j[1][1]+1))
+		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2]+1)*
+							(wigner3j[0][2]-sign*wigner3j[1][2]))
 	return coeffs
 	
 
