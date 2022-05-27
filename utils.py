@@ -9,6 +9,11 @@ def strip_key(s):
     m=np.array(m1)
     return l,m
 
+def to_key(l1,l2,l3,m1,m2,m3):
+    idx1=str(int(l1))+"."+str(int(l2))+"."+str(int(l3))+"."
+    idx2=str(int(m1))+"."+str(int(m2))+"."+str(int(m3))
+    return idx1+idx2
+
 file = open("ana.pkl", "rb")
 dic = pkl.load(file)
 print(dic)

@@ -7,6 +7,7 @@ Created on Mon May 16 09:30:16 2022
 
 import numpy as np
 import pipeline
+import utils
 
 
 # Variables used as Globals:
@@ -508,14 +509,15 @@ def find_wigner(wigner0, print_recursion=True,
 		# anymore, the line below must be modified to get the 
 		# value from the known_3js
 		for i, wigner in enumerate(Wigners):
-			print_lll(wigner)
-			w = float(pipeline.give_val_ana(*wigner[0],*wigner[1])) # TO-OJASWI: this line
-			print("Calculated 0: " + str(W_values[i]) +
-			#print("Calculated 0: " + str(sol0[i]) +# " / Rel. Error: " + str()
-			   #"\nCalculated 2: " + str(float(sol2[i])) + 
-			   #"\nCalculated 3: " + str(float(sol3[i])) + 
-			   "\nCorrect: " + str(w) +
-			   "\n-----------------------------------------------------")
+			#if utils.to_key(*wigner[0],*wigner[1]) in pipeline.wigner_dict_ana.keys():
+				print_lll(wigner)
+				#w = float(pipeline.give_val_ana(*wigner[0],*wigner[1])) # TO-OJASWI: this line
+				print("Calculated 0: " + str(W_values[i]) +
+				#print("Calculated 0: " + str(sol0[i]) +# " / Rel. Error: " + str()
+				#"\nCalculated 2: " + str(float(sol2[i])) + 
+				#"\nCalculated 3: " + str(float(sol3[i])) + 
+				#"\nCorrect: " + str(w) +
+				"\n-----------------------------------------------------")
 	
 	recursion_count = 0 # setting back to 0
 	
