@@ -542,22 +542,16 @@ if __name__=="__main__":
 	# the known_3js must be modified to receive the 
 	# (l1,l2,l3,m1,m2,m3) and its respective value.
 
-	known_3js = [[list(wigner0[0]),[-1,0,1]],
-				 [list(wigner0[0]),[-1,1,0]],
-				 [list(wigner0[0]),[0,-1,1]],
-				 [list(wigner0[0]),[0,0,0]],
-				 [list(wigner0[0]),[0,1,-1]],
-				 [list(wigner0[0]),[1,-1,0]],
-				 [list(wigner0[0]),[1,0,-1]],
-				 wigner0.tolist()]
-	# known_3js = [[list(wigner0[0]),[-2,0,2],pipeline.give_val_ana(wigner0[0],np.array([-2,0,2]))],
-	# 			 [list(wigner0[0]),[-2,2,0],pipeline.give_val_ana(wigner0[0],np.array([-2,2,0]))],
-	# 			 [list(wigner0[0]),[0,-2,2],pipeline.give_val_ana(wigner0[0],np.array([0,-2,2]))],
-	# 			 [list(wigner0[0]),[0,0,0], pipeline.give_val_ana(wigner0[0],np.array([0,0,0]))],
-	# 			 [list(wigner0[0]),[0,2,-2],pipeline.give_val_ana(wigner0[0],np.array([0,2,-2]))],
-	# 			 [list(wigner0[0]),[2,-2,0],pipeline.give_val_ana(wigner0[0],np.array([2,-2,0]))],
-	# 			 [list(wigner0[0]),[2,0,-2],pipeline.give_val_ana(wigner0[0],np.array([2,0,-2]))],
-	# 			 [wigner0.tolist(), pipeline.give_val_ana(wigner0.tolist())]]
+	# known_3js = [[list(wigner0[0]),[-1,0,1]],
+	# 			 [list(wigner0[0]),[-1,1,0]],
+	# 			 [list(wigner0[0]),[0,-1,1]],
+	# 			 [list(wigner0[0]),[0,0,0]],
+	# 			 [list(wigner0[0]),[0,1,-1]],
+	# 			 [list(wigner0[0]),[1,-1,0]],
+	# 			 [list(wigner0[0]),[1,0,-1]],
+	# 			 wigner0.tolist()]
+	known_3js=utils.load_all_keys()
+	known_3js.append(wigner0.tolist())
 				  
 				  # although wigner0 is not known yet,
 				  # it is part of the stop condition.

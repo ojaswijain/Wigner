@@ -14,6 +14,17 @@ def to_key(l1,l2,l3,m1,m2,m3):
     idx2=str(int(m1))+"."+str(int(m2))+"."+str(int(m3))
     return idx1+idx2
 
+def load_all_keys():
+    ftr=open("ana.pkl", 'rb')
+    dic=pkl.load(ftr)
+    all_keys=dic.keys()
+    known_3js=[]
+    for x in all_keys:
+        l,m=strip_key(x)
+        known_3js.append([list(l),list(m)])
+    return known_3js
+
+
 file = open("ana.pkl", "rb")
 dic = pkl.load(file)
 print(dic)
