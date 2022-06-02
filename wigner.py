@@ -525,13 +525,7 @@ def find_wigner(wigner0, print_recursion=True,
 
 if __name__=="__main__":
 		
-	#wigner0 = np.array([[9,10,5],[-4,7,-3]])
-	#wigner0 = np.array([[9,10,5],[1,0,-1]])
 	wigner0 = np.array([[120,130,140],[-4,3,1]])
-	#wigner0 = np.array([[100,99,3],[-100,98,2]])
-	#wigner0 = np.array([[100,99,19],[-8,4,4]])
-	#wigner0 = np.array([[100,99,19],[-,1,2]])
-	#wigner0 = np.array([[5,5,4],[-1,1,0]])
 
 	print_recursion = True
 	print_matrices = True
@@ -555,16 +549,6 @@ if __name__=="__main__":
 				  
 				  # although wigner0 is not known yet,
 				  # it is part of the stop condition.
-				  
 
-
-	#print("Starting point:")
-	#print_lll(wigner0)
-
-	l1,l2,l3 = 3,4,5
-	#for m1 in range(-l1,l1+1):
-	#	for m2 in range(-l2,l2+1):
-	#		for m3 in range(-l3,l3+1):
-	#			wigner0 = np.array([[l1,l2,l3],[m1,m2,m3]])
 	print("Calculating recursion...\n")
 	find_wigner(wigner0, print_recursion, print_matrices, print_results)
