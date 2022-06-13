@@ -15,7 +15,6 @@ recursion_count = 0
 iteration_coeffs = []
 iteration_3js = []
 
-
 def print_lll(wigner3j):
 	l1,l2,l3 = wigner3j[0][0], wigner3j[0][1], wigner3j[0][2]
 	m1,m2,m3 = wigner3j[1][0], wigner3j[1][1], wigner3j[1][2]
@@ -176,7 +175,7 @@ def recursion_2(wigner3j, previous_sign=0):
 	
 	return wigner1, wigner3, coeffs, -sign
 	
-	
+check=-1	
 	
 def recursion_3(wigner3j, previous_sign=0):
 	'''
@@ -190,7 +189,7 @@ def recursion_3(wigner3j, previous_sign=0):
 	e.g. choosing the first m to +-1:
 	# (m-+1, m+-1, m), (m, m, m), (m-+1, m, m+-1)
 	'''
-	
+
 	# This method is just recursion_2 without the "last m" lowering.
 	
 	sign1 = np.sign(wigner3j[1][0])
@@ -269,7 +268,125 @@ def recursion_3(wigner3j, previous_sign=0):
 		coeffs = recursion_coeffs(wigner3j, 2, sign)
 	
 	return wigner1, wigner3, coeffs, -sign
+
+def recursion_brute(wigner3j):
 	
+	sign1 = np.sign(wigner3j[1][0])
+	sign2 =	np.sign(wigner3j[1][1])
+	sign3 =	np.sign(wigner3j[1][2])
+
+	a = abs(wigner3j[1][0])
+	b = abs(wigner3j[1][1])
+	c = abs(wigner3j[1][2])	
+
+	if a>b and a>c:
+		sign = sign1
+		wigner1 = np.array(
+				  [wigner3j[0],
+				   [wigner3j[1][0]-sign,
+				    wigner3j[1][1]+sign,
+				    wigner3j[1][2]]]
+				  )
+						    
+		wigner3 = np.array(
+				  [wigner3j[0],
+				   [wigner3j[1][0]-sign,
+				    wigner3j[1][1],
+				    wigner3j[1][2]+sign]]
+				  )
+		
+		coeffs = recursion_coeffs(wigner3j, 0, sign)
+
+	elif b>a and b>c:
+		sign = sign2
+		wigner1 = np.array(
+				[wigner3j[0],
+				[wigner3j[1][0]+sign,			   
+				wigner3j[1][1]-sign,
+				wigner3j[1][2]]]
+				)
+
+		wigner3 = np.array(
+				[wigner3j[0],
+				[wigner3j[1][0],
+				wigner3j[1][1]-sign,
+				wigner3j[1][2]+sign]]
+			)
+		
+		coeffs = recursion_coeffs(wigner3j, 1, sign)
+
+	elif c>a and c>b:
+		sign = sign3
+		wigner1 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0]+sign,
+			wigner3j[1][1],
+			wigner3j[1][2]-sign]]
+		)
+
+		wigner3 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0],
+			wigner3j[1][1]+sign,
+			wigner3j[1][2]-sign]]
+		)
+
+		coeffs = recursion_coeffs(wigner3j, 2, sign)	
+
+	elif a==b:
+		sign = sign1
+		wigner1 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0]-sign,
+			wigner3j[1][1]+sign,
+			wigner3j[1][2]]]
+		)
+		wigner3 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0]-sign,
+			wigner3j[1][1],
+			wigner3j[1][2]+sign]]
+		)
+
+		coeffs = recursion_coeffs(wigner3j, 0, sign)
+	
+	elif b==c:
+		sign = sign2
+		wigner1 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0],
+			wigner3j[1][1]-sign,
+			wigner3j[1][2]+sign,]]
+		)
+		wigner3 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0]+sign,
+			wigner3j[1][1]-sign,
+			wigner3j[1][2]]]
+		)
+
+		coeffs = recursion_coeffs(wigner3j, 1, sign)
+
+	elif c==a:
+		sign = sign3
+		wigner1 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0]+sign,
+			wigner3j[1][1],
+			wigner3j[1][2]-sign]]
+		)
+		wigner3 = np.array(
+			[wigner3j[0],
+			[wigner3j[1][0],
+			wigner3j[1][1]+sign,
+			wigner3j[1][2]-sign]]
+		)
+
+		coeffs = recursion_coeffs(wigner3j, 2, sign)
+
+	return wigner1, wigner3, coeffs, -sign
+				
+
 	
 #####################
 # APPLYING RECURSION
@@ -288,7 +405,8 @@ def wigner_recursion(wigner3j, sign=0, node=0, print_recursion=True):
 	global recursion_count, known_3js, iteration_coeffs, iteration_3js
 	recursion_count+=1
 
-	wigner1, wigner3, coeffs, sign = recursion_3(wigner3j, previous_sign=sign)
+	wigner1, wigner3, coeffs, sign = recursion_2(wigner3j, previous_sign=sign)
+	# wigner1, wigner3, coeffs, sign = recursion_brute(wigner3j)
 	wigners = [wigner1.tolist(),
 			   wigner3j.tolist(),
 			   wigner3.tolist()]
