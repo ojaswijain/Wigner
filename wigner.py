@@ -9,6 +9,7 @@ import numpy as np
 import pipeline
 import utils
 
+
 # Variables used as Globals:
 recursion_count = 0	
 iteration_coeffs = []
@@ -23,6 +24,7 @@ def print_lll(wigner3j):
 ###################
 # RECURSION ORDERS
 
+
 def recursion_coeffs(wigner3j, m_idx, sign):
 	'''
 	m_idx is the index of the m chosen to be lowered down
@@ -32,31 +34,35 @@ def recursion_coeffs(wigner3j, m_idx, sign):
 	coeffs = [0,0,0]
 	if m_idx==0:
 		
-		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0]+1)*
-							(wigner3j[0][0]-sign*wigner3j[1][0]))
-		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1])*
-							(wigner3j[0][1]-sign*wigner3j[1][1]+1))
-		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2])*
-							(wigner3j[0][2]-sign*wigner3j[1][2]+1))
+		coeffs[1] = np.sqrt((wigner3j[0][0]+sign*(wigner3j[1][0]-sign)+1)*
+							(wigner3j[0][0]-sign*(wigner3j[1][0]-sign)))
+		coeffs[0] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1]+1)*
+							(wigner3j[0][1]-sign*wigner3j[1][1]))
+		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2]+1)*
+							(wigner3j[0][2]-sign*wigner3j[1][2]))
 	
 	elif m_idx==1:
 	
-		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0])*
-							(wigner3j[0][0]-sign*wigner3j[1][0]+1))
-		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1]+1)*
-							(wigner3j[0][1]-sign*wigner3j[1][1]))
-		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2])*
-							(wigner3j[0][2]-sign*wigner3j[1][2]+1))
+		coeffs[2] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0]+1)*
+							(wigner3j[0][0]-sign*wigner3j[1][0]))
+		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*(wigner3j[1][1]-sign)+1)*
+							(wigner3j[0][1]-sign*(wigner3j[1][1]-sign)))
+		coeffs[0] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2]+1)*
+							(wigner3j[0][2]-sign*wigner3j[1][2]))
 	
 	elif m_idx==2:
 	
-		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0])*
-							(wigner3j[0][0]-sign*wigner3j[1][0]+1))
-		coeffs[1] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1])*
-							(wigner3j[0][1]-sign*wigner3j[1][1]+1))
-		coeffs[2] = np.sqrt((wigner3j[0][2]+sign*wigner3j[1][2]+1)*
-							(wigner3j[0][2]-sign*wigner3j[1][2]))
+		coeffs[0] = np.sqrt((wigner3j[0][0]+sign*wigner3j[1][0]+1)*
+							(wigner3j[0][0]-sign*wigner3j[1][0]))
+		coeffs[2] = np.sqrt((wigner3j[0][1]+sign*wigner3j[1][1]+1)*
+							(wigner3j[0][1]-sign*wigner3j[1][1]))
+		coeffs[1] = np.sqrt((wigner3j[0][2]+sign*(wigner3j[1][2]-sign)+1)*
+							(wigner3j[0][2]-sign*(wigner3j[1][2]-sign)))
+
 	return coeffs
+	
+
+
 
 def recursion_2(wigner3j, previous_sign=0):
 	'''
@@ -169,8 +175,11 @@ def recursion_2(wigner3j, previous_sign=0):
 			coeffs = recursion_coeffs(wigner3j, 1, sign)
 	
 	return wigner1, wigner3, coeffs, -sign	
+
+check=-1
 	
 def recursion_3(wigner3j, previous_sign=0):
+	global check
 	'''
 	This recursion method selects one of the first two m's to sum up or
 	lower down one unit from. This ensures to keep constant the total
@@ -199,6 +208,9 @@ def recursion_3(wigner3j, previous_sign=0):
 		# (m+-1, m-+1, m), (m, m, m), (m+-1, m, m-+1)
 		
 		sign = sign1
+		if sign==0:
+			sign=check
+			check=check*-1
 		
 		wigner1 = np.array(
 				  [wigner3j[0],
@@ -223,6 +235,9 @@ def recursion_3(wigner3j, previous_sign=0):
 		# (m-+1, m+-1, m), (m, m, m), (m, m+-1, m-+1)
 		
 		sign = sign2
+		if sign==0:
+			sign=check
+			check=check*-1
 		
 		wigner1 = np.array(
 				  [wigner3j[0],
@@ -243,6 +258,9 @@ def recursion_3(wigner3j, previous_sign=0):
 		
 	else:		
 		sign = sign3
+		if sign==0:
+			sign=check
+			check=check*-1
 		
 		wigner1 = np.array(
 				  [wigner3j[0],
@@ -294,16 +312,16 @@ def recursion_brute(wigner3j):
 		sign = sign2
 		wigner1 = np.array(
 				[wigner3j[0],
-				[wigner3j[1][0]+sign,			   
+				[wigner3j[1][0],			   
 				wigner3j[1][1]-sign,
-				wigner3j[1][2]]]
+				wigner3j[1][2]+sign]]
 				)
 
 		wigner3 = np.array(
 				[wigner3j[0],
-				[wigner3j[1][0],
+				[wigner3j[1][0]+sign,
 				wigner3j[1][1]-sign,
-				wigner3j[1][2]+sign]]
+				wigner3j[1][2]]]
 			)
 		
 		coeffs = recursion_coeffs(wigner3j, 1, sign)
@@ -380,11 +398,20 @@ def recursion_brute(wigner3j):
 	return wigner1, wigner3, coeffs, -sign
 				
 
+	
 #####################
 # APPLYING RECURSION
-#####################
+
 
 def wigner_recursion(wigner3j, sign=0, node=0, print_recursion=True):
+	'''
+	print("\n")
+	print_lll(l1,l2,l3,m1,m2-1,m3+1)
+	print("")
+	print_lll(l1,l2,l3,m1,m2,m3)
+	print("")
+	print_lll(l1,l2,l3,m1,m2+1,m3-1)
+	'''
 	
 	global recursion_count, known_3js, iteration_coeffs, iteration_3js
 	recursion_count+=1
@@ -409,29 +436,27 @@ def wigner_recursion(wigner3j, sign=0, node=0, print_recursion=True):
 	
 	node = recursion_count
 	
-	if (wigner1.tolist() in known_3js or 
-		wigner3.tolist() in known_3js or 
-		wigners in iteration_3js):
-		iteration_coeffs.append(coeffs)
-		iteration_3js.append(wigners)	
+	if (#wigner1.tolist() in known_3js or 
+	# 	#wigner3.tolist() in known_3js or 
+	 	wigners in iteration_3js):
+		# iteration_coeffs.append(coeffs)
+		# iteration_3js.append(wigners)	
+		return
 		
 	else:
 		iteration_coeffs.append(coeffs)
 		iteration_3js.append(wigners)
-		next_wigner11, next_wigner12 = wigner_recursion(wigner1,
-														sign,
-														node,
-														print_recursion)
-		next_wigner31, next_wigner32 = wigner_recursion(wigner3,
-														sign,
-														node,
-														print_recursion)
-   
-	return wigner1, wigner3
+		if wigner1.tolist() not in known_3js:
+			wigner_recursion(wigner1,sign,node,print_recursion)
+		if wigner3.tolist() not in known_3js:
+			wigner_recursion(wigner3,sign,node,	print_recursion)
+	
+	return
 
 
 ########################
 # SOLVING LINEAR SYSTEMS
+
 
 def forward_subs(L,b):
     y=[]
@@ -454,6 +479,8 @@ def solve_system_LU(L,U,b):
     y=forward_subs(L,b)
     x=back_subs(U,y)
     return x
+
+	
 	
 def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
@@ -521,7 +548,11 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
 	# Simple Inversion Method
 	if True:
+		# C @ W = V
+		# C.T @ C @ W = C.T @ V
+		# W = inv(C.T @ C) @ C.T @ V
 		sol = np.linalg.inv(C.T @ C) @ C.T @ V
+		sol0 = sol
 
 	# QR Decomposition
 	elif False:
@@ -570,8 +601,12 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		sol4_permu = solve_system_LU(L,U,V_permu)
 		sol4 = P.T @ sol4_permu
 	
-	return W, sol
+
+	# returns the list of wigners and its respective values
+	return W, sol#sol0, sol2, sol3, sol4
 		
+		
+
 def find_wigner(wigner0, print_recursion=True, 
 						 print_matrices=False,
 						 print_results=True):
@@ -584,7 +619,9 @@ def find_wigner(wigner0, print_recursion=True,
 	
 	print("Number of steps: {}\n".format(recursion_count))
 
-	Wigners, W_values = solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices)
+	Wigners, W_values = solve_wigner_system(iteration_3js, iteration_coeffs,
+	#Wigners, sol0,sol2,sol3 = solve_wigner_system(iteration_3js, iteration_coeffs,
+												  print_matrices)
 	
 	if print_results:
 		print("\n****************************\n" + 
@@ -597,15 +634,23 @@ def find_wigner(wigner0, print_recursion=True,
 		# anymore, the line below must be modified to get the 
 		# value from the known_3js
 		for i, wigner in enumerate(Wigners):
+			#if utils.to_key(*wigner[0],*wigner[1]) in pipeline.wigner_dict_ana.keys():
 				print_lll(wigner)
 				#w = float(pipeline.give_val_ana(*wigner[0],*wigner[1])) # TO-OJASWI: this line
 				print("Calculated 0: " + str(W_values[i]) +
+				#print("Calculated 0: " + str(sol0[i]) +# " / Rel. Error: " + str()
+				#"\nCalculated 2: " + str(float(sol2[i])) + 
+				#"\nCalculated 3: " + str(float(sol3[i])) + 
+				#"\nCorrect: " + str(w) +
 				"\n-----------------------------------------------------")
 	
 	recursion_count = 0 # setting back to 0
 	
+
+
 if __name__=="__main__":
 		
+	# wigner0 = np.array([[120,130,140],[-20,15,5]])
 	# wigner0 = np.array([[120,130,140],[-1,2,-1]])
 	wigner0 = np.array([[120,130,140],[-4,3,1]])
 
@@ -613,8 +658,24 @@ if __name__=="__main__":
 	print_matrices = True
 	print_results = True
 
+
+	# ===========TO-OJASWI-1=========
+	# the known_3js must be modified to receive the 
+	# (l1,l2,l3,m1,m2,m3) and its respective value.
+
+	# known_3js = [[list(wigner0[0]),[-1,0,1]],
+	# 			 [list(wigner0[0]),[-1,1,0]],
+	# 			 [list(wigner0[0]),[0,-1,1]],
+	# 			 [list(wigner0[0]),[0,0,0]],
+	# 			 [list(wigner0[0]),[0,1,-1]],
+	# 			 [list(wigner0[0]),[1,-1,0]],
+	# 			 [list(wigner0[0]),[1,0,-1]],
+	# 			 wigner0.tolist()]
 	known_3js=utils.load_all_keys()
 	known_3js.append(wigner0.tolist())
+				  
+				  # although wigner0 is not known yet,
+				  # it is part of the stop condition.
 
 	print("Calculating recursion...\n")
 	find_wigner(wigner0, print_recursion, print_matrices, print_results)
