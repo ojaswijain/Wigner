@@ -473,18 +473,19 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
 	for i, wigs in enumerate(iteration_3js):
 	
-		any_known = False
 		C.append(np.zeros(len(W)).tolist())
 		
 		for j, wig in enumerate(wigs):
+			
+			v = 0.
+			
 			# ===========TO-OJASWI-2=========
 			# since we are not using the sympy.physics.wigner_3j
 			# anymore, the line below must be modified to get the 
 			# value from the known_3js
 			if wig in known_3js[0:-1]:
-				any_known = True
 				wig_value = pipeline.give_val_ana(*wig[0],*wig[1]) # TO-OJASWI: this line
-				V.append(float(-wig_value*iteration_coeffs[i][j]))
+				v += float(-wig_value*iteration_coeffs[i][j])
 				
 			elif wig in W:
 				idx = W.index(wig)
@@ -496,7 +497,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 				C = np.hstack((C, new_column)).tolist()
 				C[i][-1] = iteration_coeffs[i][j]
 			
-		if not any_known: V.append(0.)
+		V.append(v)
 	
 	C = np.array(C)
 	V = np.array(V)
