@@ -176,7 +176,7 @@ def recursion_2(wigner3j, previous_sign=0):
 	
 	return wigner1, wigner3, coeffs, -sign	
 
-check=-1
+check=1
 	
 def recursion_3(wigner3j, previous_sign=0):
 	global check
@@ -210,7 +210,7 @@ def recursion_3(wigner3j, previous_sign=0):
 		sign = sign1
 		if sign==0:
 			sign=check
-			check=check*-1
+			check=-check
 		
 		wigner1 = np.array(
 				  [wigner3j[0],
@@ -237,7 +237,7 @@ def recursion_3(wigner3j, previous_sign=0):
 		sign = sign2
 		if sign==0:
 			sign=check
-			check=check*-1
+			check=-check
 		
 		wigner1 = np.array(
 				  [wigner3j[0],
@@ -260,7 +260,7 @@ def recursion_3(wigner3j, previous_sign=0):
 		sign = sign3
 		if sign==0:
 			sign=check
-			check=check*-1
+			check=-check
 		
 		wigner1 = np.array(
 				  [wigner3j[0],
@@ -502,9 +502,9 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
 		C.append(np.zeros(len(W)).tolist())
 		
+		v = 0.
 		for j, wig in enumerate(wigs):
 			
-			v = 0.
 			
 			# ===========TO-OJASWI-2=========
 			# since we are not using the sympy.physics.wigner_3j
@@ -512,7 +512,8 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 			# value from the known_3js
 			if wig in known_3js[0:-1]:
 				wig_value = pipeline.give_val_ana(*wig[0],*wig[1]) # TO-OJASWI: this line
-				v += float(-wig_value*iteration_coeffs[i][j])
+				x	= float(wig_value*iteration_coeffs[i][j])
+				v = v - x
 				
 			elif wig in W:
 				idx = W.index(wig)
@@ -650,7 +651,7 @@ def find_wigner(wigner0, print_recursion=True,
 
 if __name__=="__main__":
 		
-	# wigner0 = np.array([[120,130,140],[-20,15,5]])
+	# wigner0 = np.array([[120,130,140],[-10,5,5]])
 	# wigner0 = np.array([[120,130,140],[-1,2,-1]])
 	wigner0 = np.array([[120,130,140],[-4,3,1]])
 
@@ -663,19 +664,8 @@ if __name__=="__main__":
 	# the known_3js must be modified to receive the 
 	# (l1,l2,l3,m1,m2,m3) and its respective value.
 
-	# known_3js = [[list(wigner0[0]),[-1,0,1]],
-	# 			 [list(wigner0[0]),[-1,1,0]],
-	# 			 [list(wigner0[0]),[0,-1,1]],
-	# 			 [list(wigner0[0]),[0,0,0]],
-	# 			 [list(wigner0[0]),[0,1,-1]],
-	# 			 [list(wigner0[0]),[1,-1,0]],
-	# 			 [list(wigner0[0]),[1,0,-1]],
-	# 			 wigner0.tolist()]
 	known_3js=utils.load_all_keys()
 	known_3js.append(wigner0.tolist())
-				  
-				  # although wigner0 is not known yet,
-				  # it is part of the stop condition.
 
 	print("Calculating recursion...\n")
 	find_wigner(wigner0, print_recursion, print_matrices, print_results)
