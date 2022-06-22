@@ -437,11 +437,7 @@ def wigner_recursion(wigner3j, sign=0, node=0, print_recursion=True):
 	
 	node = recursion_count
 	
-	if (#wigner1.tolist() in known_3js or 
-	# 	#wigner3.tolist() in known_3js or 
-	 	wigners in iteration_3js):
-		# iteration_coeffs.append(coeffs)
-		# iteration_3js.append(wigners)	
+	if (wigners in iteration_3js):
 		return
 		
 	else:
@@ -605,15 +601,16 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
 
 	# returns the list of wigners and its respective values
-	return W, sol#sol0, sol2, sol3, sol4
+	return W, sol
 		
-		
+x=[]
+y=[]		
 
 def find_wigner(wigner0, print_recursion=True, 
 						 print_matrices=False,
 						 print_results=True):
 
-	global recursion_count, iteration_coeffs, iteration_3js
+	global recursion_count, iteration_coeffs, iteration_3js, x, y
 	iteration_coeffs = []
 	iteration_3js = []
 	
@@ -621,41 +618,34 @@ def find_wigner(wigner0, print_recursion=True,
 	
 	print("Number of steps: {}\n".format(recursion_count))
 
-	Wigners, W_values = solve_wigner_system(iteration_3js, iteration_coeffs,
-	#Wigners, sol0,sol2,sol3 = solve_wigner_system(iteration_3js, iteration_coeffs,
-												  print_matrices)
+	Wigners, W_values = solve_wigner_system(iteration_3js, iteration_coeffs,print_matrices)
 	
 	if print_results:
 		print("\n****************************\n" + 
 				"**********Results:**********\n" + 
 				"****************************\n")
 		
-		
 		# ===========TO-OJASWI-3=========
 		# since we are not using the sympy.physics.wigner_3j
 		# anymore, the line below must be modified to get the 
 		# value from the known_3js
 		for i, wigner in enumerate(Wigners):
-			#if utils.to_key(*wigner[0],*wigner[1]) in pipeline.wigner_dict_ana.keys():
-				print_lll(wigner)
-				w = float(wigner_3j(*wigner[0],*wigner[1]))
-				#w = float(pipeline.give_val_ana(*wigner[0],*wigner[1])) # TO-OJASWI: this line
-				x= float(w-W_values[i])
-				print("Calculated 0: " + str(W_values[i]) +
-				#print("Calculated 0: " + str(sol0[i]) +# " / Rel. Error: " + str()
-				#"\nCalculated 2: " + str(float(sol2[i])) + 
-				#"\nCalculated 3: " + str(float(sol3[i])) + 
-				"\nCorrect: " + str(w) +
-				"\nRel. Error: " + str(x) +
-				"\n-----------------------------------------------------")
-	
+			print_lll(wigner)
+			w = float(wigner_3j(*wigner[0],*wigner[1]))
+			e= float((w-W_values[i])/w)
+			print("Calculated 0: " + str(W_values[i]) +
+			"\nCorrect: " + str(w) +
+			"\nRel. Error: " + str(e) +
+			"\n-----------------------------------------------------")
+			x.append(np.abs(wigner[1]).max())
+			y.append(e)
 	recursion_count = 0 # setting back to 0
 	
 
 
 if __name__=="__main__":
 		
-	wigner0 = np.array([[120,130,140],[-10,6,4]])
+	wigner0 = np.array([[120,130,140],[-20,10,10]])
 	# wigner0 = np.array([[120,130,140],[-1,2,-1]])
 	# wigner0 = np.array([[120,130,140],[-4,3,1]])
 
@@ -673,3 +663,5 @@ if __name__=="__main__":
 
 	print("Calculating recursion...\n")
 	find_wigner(wigner0, print_recursion, print_matrices, print_results)
+	print(x)
+	print(y)
