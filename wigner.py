@@ -9,6 +9,8 @@ import numpy as np
 import pipeline
 import utils
 from sympy.physics.wigner import wigner_3j
+import time
+import feeder
 
 
 # Variables used as Globals:
@@ -545,7 +547,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
 	
 	# Simple Inversion Method
-	if True:
+	if False:
 		# C @ W = V
 		# C.T @ C @ W = C.T @ V
 		# W = inv(C.T @ C) @ C.T @ V
@@ -570,8 +572,8 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 				pass#print(i)
 	
 	# Least Squares Method
-	if False:
-		sol = np.linalg.lstsq(C,V)[0]
+	if True:
+		sol = np.linalg.lstsq(C,V, rcond=0)[0]
 		sol2 = sol
 	
 	# SVD Method
@@ -590,7 +592,6 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		
 		sol = np.linalg.inv(V_svd) @ y
 		sol3 = sol
-		
 	
 	if False:
 		from scipy.linalg import lu
@@ -598,8 +599,9 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		V_permu = P @ V
 		sol4_permu = solve_system_LU(L,U,V_permu)
 		sol4 = P.T @ sol4_permu
+		sol = sol4
 	
-
+	# print((C@sol)-V)
 	# returns the list of wigners and its respective values
 	return W, sol
 		
@@ -631,37 +633,45 @@ def find_wigner(wigner0, print_recursion=True,
 		# value from the known_3js
 		for i, wigner in enumerate(Wigners):
 			print_lll(wigner)
-			w = float(wigner_3j(*wigner[0],*wigner[1]))
-			e= float((w-W_values[i])/w)
-			print("Calculated 0: " + str(W_values[i]) +
-			"\nCorrect: " + str(w) +
-			"\nRel. Error: " + str(e) +
+			# w = float(wigner_3j(*wigner[0],*wigner[1]))
+			# e= float((w-W_values[i])/w)
+			print("Calculated: " + str(W_values[i]) +
+			# "\nCorrect: " + str(w) +
+			# "\nRel. Error: " + str(e) +
 			"\n-----------------------------------------------------")
+			pipeline.store_val_ana(np.array(wigner[0]), np.array(wigner[1]), W_values[i])
 			x.append(np.abs(wigner[1]).max())
-			y.append(e)
+			# y.append(e)
 	recursion_count = 0 # setting back to 0
 	
 
 
 if __name__=="__main__":
+
+	start = time.time()
+	feeder.feed()
+	for i in np.arange(1,11):
 		
-	wigner0 = np.array([[120,130,140],[-20,10,10]])
-	# wigner0 = np.array([[120,130,140],[-1,2,-1]])
-	# wigner0 = np.array([[120,130,140],[-4,3,1]])
+		wigner0 = np.array([[120,130,140],[-10*i,5*i,5*i]])
+		# wigner0 = np.array([[120,130,140],[-1,2,-1]])
+		# wigner0 = np.array([[120,130,140],[-4,3,1]])
 
-	print_recursion = True
-	print_matrices = True
-	print_results = True
+		print_recursion = False
+		print_matrices = False
+		print_results = True
 
 
-	# ===========TO-OJASWI-1=========
-	# the known_3js must be modified to receive the 
-	# (l1,l2,l3,m1,m2,m3) and its respective value.
+		# ===========TO-OJASWI-1=========
+		# the known_3js must be modified to receive the 
+		# (l1,l2,l3,m1,m2,m3) and its respective value.
 
-	known_3js=utils.load_all_keys()
-	known_3js.append(wigner0.tolist())
+		known_3js=utils.load_all_keys()
+		known_3js.append(wigner0.tolist())
 
-	print("Calculating recursion...\n")
-	find_wigner(wigner0, print_recursion, print_matrices, print_results)
-	print(x)
-	print(y)
+		print("Calculating recursion...\n")
+		find_wigner(wigner0, print_recursion, print_matrices, print_results)
+		print(len(x))
+		end = time.time()
+		print(end - start)
+
+	print("\n****************************\n")
