@@ -12,7 +12,7 @@ import time
 import pipeline
 import utils
 from decimal import *
-from scipy.linalg import lu_factor, lu_solve
+from scipy.linalg import lu_factor, lu_solve, svd
 from plotter import plotter
 
 # Variables used as Globals:
@@ -493,7 +493,12 @@ def mprove(C,V):
 		x = x-delx
 	return x#, delx
 
-	
+def solve_svd(A,b):
+    U,s,Vh = svd(A)
+    c = np.dot(U.T,b)
+    w = np.dot(np.diag(1/s),c)
+    x = np.dot(Vh.conj().T,w)
+    return x
 	
 def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
@@ -541,10 +546,8 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		V.append(v)
 	
 	C = np.array(C)
-	# C = [R(x) for x in C]
 	V = np.array(V)
-	# V = [R(x) for x in V]
-	sol = np.linalg.lstsq(C,V, rcond=None)
+	# sol = np.linalg.lstsq(C,V, rcond=None)
 
 	if print_matrices:
 		print("\nCoefficients matrix:")	
@@ -562,7 +565,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		print("Is the system solvable? {}".format(solving_str[rank>=n_vars]))
 	
 	
-	if True:
+	if False:
 		sol = mprove(C,V)
 	
 	# Simple Inversion Method
@@ -601,21 +604,12 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 			sol = sol - sol0
 	
 	# SVD Method
-	if False:
-		b = V
-		U_svd,S_svd,V_svd = np.linalg.svd(C)
-		
-		d = np.linalg.inv(U_svd) @ b
-		i_max = len(S_svd) # S is in descending order
-		
-		print(np.linalg.inv(U_svd))
-		print(d)
-		print(S_svd)
-		
-		y = d[0:i_max]/S_svd[0:i_max]
-		
-		sol = np.linalg.inv(V_svd) @ y
-		sol3 = sol
+	if True:
+		sol = solve_svd(C,V)
+		for i in range(1,11):
+			delV = C @ sol - V
+			sol0 = solve_svd(C,delV)
+			sol = sol - sol0
 	
 	if False:
 		from scipy.linalg import lu
@@ -699,5 +693,5 @@ if __name__=="__main__":
 		end = time.time()
 		print(end - start)
 
-	plotter(x,y,"Mprove20","Red")
+	plotter(x,y,"SVD10","Red")
 	print("\n****************************\n")
