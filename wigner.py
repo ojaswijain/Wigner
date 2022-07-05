@@ -682,6 +682,9 @@ if __name__=="__main__":
 		# the known_3js must be modified to receive the 
 		# (l1,l2,l3,m1,m2,m3) and its respective value.
 
+		# wignerx=np.array([[120,130,140],[-10*i/2,5*i/2,5*i/2]])
+		# w = float(wigner_3j(*wignerx[0],*wignerx[1]))
+		# pipeline.store_val_ana(np.array(wignerx[0]), np.array(wignerx[1]), w)
 		known_3js=utils.load_all_keys()
 		known_3js.append(wigner0.tolist())
 
