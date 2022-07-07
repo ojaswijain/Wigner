@@ -7,13 +7,12 @@ Created on Mon May 16 09:30:16 2022
 
 import numpy as np
 from sympy.physics.wigner import wigner_3j
-import scipy.sparse.linalg as ssl
 import time
 import pipeline
 import utils
-from decimal import *
 from scipy.linalg import lu_factor, lu_solve, svd
 from plotter import plotter
+import pandas as pd
 
 # Variables used as Globals:
 recursion_count = 0	
@@ -485,7 +484,7 @@ def mprove(C,V):
 	lu, piv = lu_factor(C)
 	x = lu_solve((lu, piv), V)
 	n=len(V)
-	for _ in range(20):
+	for _ in range(50):
 		R=np.zeros((n))
 		for i in range(n):
 			R[i]=-V[i]+np.dot(C[i,:],x)
@@ -565,7 +564,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		print("Is the system solvable? {}".format(solving_str[rank>=n_vars]))
 	
 	
-	if False:
+	if True:
 		sol = mprove(C,V)
 	
 	# Simple Inversion Method
@@ -604,7 +603,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 			sol = sol - sol0
 	
 	# SVD Method
-	if True:
+	if False:
 		sol = solve_svd(C,V)
 		for i in range(1,11):
 			delV = C @ sol - V
@@ -658,7 +657,7 @@ def find_wigner(wigner0, print_recursion=True,
 			"\nRel. Error: " + str(e) +
 			"\n-----------------------------------------------------")
 			pipeline.store_val_ana(np.array(wigner[0]), np.array(wigner[1]), W_values[i])
-			x.append(np.abs(wigner[1]).max())
+			x.append(np.abs(wigner[1]).min())
 			y.append(e)
 	recursion_count = 0 # setting back to 0
 	
@@ -667,34 +666,45 @@ def find_wigner(wigner0, print_recursion=True,
 if __name__=="__main__":
 
 	start = time.time()
-	for i in np.arange(1,6):
-		
-		wigner0 = np.array([[120,130,140],[-10*i,5*i,5*i]])
-		# wigner0 = np.array([[120,130,140],[-1,2,-1]])
-		# wigner0 = np.array([[120,130,140],[-4,3,1]])
+	t=[]
+	v=[]
+	for m1 in range(3,20,1):
+		for m2 in range(3,20,1):
+			m3=-m1-m2
+			known_3js=utils.load_all_keys()
+			wigner0 = np.array([[120,130,140],[m1,m2,m3]])
+			# wigner0 = np.array([[120,130,140],[-1,2,-1]])
+			# wigner0 = np.array([[120,130,140],[-4,3,1]])
+			if wigner0.tolist() in known_3js:
+				continue
 
-		print_recursion = False
-		print_matrices = False
-		print_results = True
+			print_recursion = False
+			print_matrices = False
+			print_results = True
 
 
-		# ===========TO-OJASWI-1=========
-		# the known_3js must be modified to receive the 
-		# (l1,l2,l3,m1,m2,m3) and its respective value.
+			# ===========TO-OJASWI-1=========
+			# the known_3js must be modified to receive the 
+			# (l1,l2,l3,m1,m2,m3) and its respective value.
 
-		# wignerx=np.array([[120,130,140],[-10*i/2,5*i/2,5*i/2]])
-		# w = float(wigner_3j(*wignerx[0],*wignerx[1]))
-		# pipeline.store_val_ana(np.array(wignerx[0]), np.array(wignerx[1]), w)
-		known_3js=utils.load_all_keys()
-		known_3js.append(wigner0.tolist())
+			# wignerx=np.array([[120,130,140],[-10*i/2,5*i/2,5*i/2]])
+			# w = float(wigner_3j(*wignerx[0],*wignerx[1]))
+			# pipeline.store_val_ana(np.array(wignerx[0]), np.array(wignerx[1]), w)
+			known_3js.append(wigner0.tolist())
 
-		print("Calculating recursion...\n")
-		find_wigner(wigner0, print_recursion, print_matrices, print_results)
-		print(len(x))
-		print(x)
-		print(y)
-		end = time.time()
-		print(end - start)
+			print("Calculating recursion...\n")
+			find_wigner(wigner0, print_recursion, print_matrices, print_results)
+			print(len(x))
+			# print(x)
+			# print(y)
+			end = time.time()
+			t.append(end-start)
+			v.append(len(x))
+			print(end - start)
 
-	plotter(x,y,"SVD10","Red")
+	# df = pd.DataFrame({"mprove50_x":x, "mprove50_y":y})
+	# df.to_csv("errors.csv", index=False)
+	# df = pd.DataFrame({"mprove50_x":v, "mprove50_y":t})
+	# df.to_csv("time.csv", index=False)
+	plotter(x,y,"Mprove50","Red")
 	print("\n****************************\n")

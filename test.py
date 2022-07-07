@@ -22,8 +22,8 @@ def mprove(C,V):
 	return x
 
 seed=42
-A=np.arange(8)
-C=sparse.random(m=8, n=8, density=0.5, random_state=seed, format="array")
+A=np.arange(1000)
+C=sparse.random(m=1000, n=1000, density=0.5, random_state=seed, format="array")
 b=C@A
 # print(A)
 # print(C)
@@ -31,6 +31,6 @@ b=C@A
 A1=A-solve_svd(C,b)
 A2=A-mprove(C,b)
 A3=A-np.linalg.inv(C.T @ C) @ C.T @ b
-print(A1)
+# print(A1)
 print(A2)
-print(A3)
+# print(A3)
