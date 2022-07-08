@@ -27,5 +27,5 @@ def load_all_keys():
 
 file = open("ana.pkl", "rb")
 dic = pkl.load(file)
-print(dic)
+# print(dic)
 
