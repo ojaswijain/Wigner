@@ -8,7 +8,11 @@ from scipy.special import softmax
 
 
 def plotter(x,y,label,col,save=True):
+<<<<<<< HEAD
     y= [(np.log10(abs(e)+1e-18)) for e in y]
+=======
+    y= [(np.sign(e)*np.log10(abs(e)+1e-15)) for e in y]
+>>>>>>> 93f3977d9943a14ac56ec6daf16f0acb2feed302
     plt.scatter(x,y,c=col)
     plt.xlabel("Max m argument")
     plt.ylabel("Log10 of relative error")
@@ -26,6 +30,7 @@ def plot_time(x,y,label,col,save=True):
         plt.savefig(f"plots/{label}.png")
     plt.show()
 
+<<<<<<< HEAD
 def plot_wig(x,y,label,col,save=True):
     plt.plot(x,y,c=col)
     plt.xlabel("l Value")
@@ -35,6 +40,8 @@ def plot_wig(x,y,label,col,save=True):
         plt.savefig(f"plots/{label}.png")
     plt.show()
 
+=======
+>>>>>>> 93f3977d9943a14ac56ec6daf16f0acb2feed302
 def heatmap(x,y,z,label,save=True):
     z= [(0.1*(np.log10(abs(e)+1e-15))+15) for e in z]
     # z= [(1+np.sign(e)) for e in z]
