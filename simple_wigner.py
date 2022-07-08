@@ -245,7 +245,7 @@ if __name__ == "__main__":
 	pipeline.wigner_dict_ana = pkl.load(file)
 	known_3js=utils.load_all_keys()	
 	#specify l values here
-	for l in [10, 20, 30, 50, 80, 100, 200, 300, 500, 800, 1000]:
+	for l in [10, 20, 30]:#, 50, 80, 100, 200, 300, 500, 800, 1000]:
 		s=time.time()
 		# gen(l)
 		# with open('ana.pkl', 'wb') as handle:
