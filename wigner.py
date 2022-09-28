@@ -6,12 +6,13 @@ Created on Mon May 16 09:30:16 2022
 """
 
 import numpy as np
-import pipeline
-import utils
 from sympy.physics.wigner import wigner_3j
 import time
-import feeder
-
+import pipeline
+import utils
+from scipy.linalg import lu_factor, lu_solve, svd
+from plotter import plotter
+import pandas as pd
 
 # Variables used as Globals:
 recursion_count = 0	
@@ -479,7 +480,24 @@ def solve_system_LU(L,U,b):
     x=back_subs(U,y)
     return x
 
-	
+def mprove(C,V):
+	lu, piv = lu_factor(C)
+	x = lu_solve((lu, piv), V)
+	n=len(V)
+	for _ in range(50):
+		R=np.zeros((n))
+		for i in range(n):
+			R[i]=-V[i]+np.dot(C[i,:],x)
+		delx=lu_solve((lu, piv), R)
+		x = x-delx
+	return x#, delx
+
+def solve_svd(A,b):
+    U,s,Vh = svd(A)
+    c = np.dot(U.T,b)
+    w = np.dot(np.diag(1/s),c)
+    x = np.dot(Vh.conj().T,w)
+    return x
 	
 def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
@@ -528,7 +546,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 	
 	C = np.array(C)
 	V = np.array(V)
-	sol = np.linalg.lstsq(C,V, rcond=None)
+	# sol = np.linalg.lstsq(C,V, rcond=None)
 
 	if print_matrices:
 		print("\nCoefficients matrix:")	
@@ -546,13 +564,18 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		print("Is the system solvable? {}".format(solving_str[rank>=n_vars]))
 	
 	
+	if True:
+		sol = mprove(C,V)
+	
 	# Simple Inversion Method
 	if False:
 		# C @ W = V
 		# C.T @ C @ W = C.T @ V
 		# W = inv(C.T @ C) @ C.T @ V
 		sol = np.linalg.inv(C.T @ C) @ C.T @ V
-		sol0 = sol
+		delV = C @ sol - V
+		sol0 = np.linalg.inv(C.T @ C) @ C.T @ delV
+		sol = sol - sol0
 
 	# QR Decomposition
 	elif False:
@@ -572,26 +595,20 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 				pass#print(i)
 	
 	# Least Squares Method
-	if True:
+	if False:
 		sol = np.linalg.lstsq(C,V, rcond=0)[0]
-		sol2 = sol
+		for i in range(1,11):
+			delV = C @ sol - V
+			sol0 = np.linalg.lstsq(C,delV, rcond=0)[0]
+			sol = sol - sol0
 	
 	# SVD Method
 	if False:
-		b = V
-		U_svd,S_svd,V_svd = np.linalg.svd(C)
-		
-		d = np.linalg.inv(U_svd) @ b
-		i_max = len(S_svd) # S is in descending order
-		
-		print(np.linalg.inv(U_svd))
-		print(d)
-		print(S_svd)
-		
-		y = d[0:i_max]/S_svd[0:i_max]
-		
-		sol = np.linalg.inv(V_svd) @ y
-		sol3 = sol
+		sol = solve_svd(C,V)
+		for i in range(1,11):
+			delV = C @ sol - V
+			sol0 = solve_svd(C,delV)
+			sol = sol - sol0
 	
 	if False:
 		from scipy.linalg import lu
@@ -601,7 +618,7 @@ def solve_wigner_system(iteration_3js, iteration_coeffs, print_matrices=False):
 		sol4 = P.T @ sol4_permu
 		sol = sol4
 	
-	# print((C@sol)-V)
+	# print(err_sol)
 	# returns the list of wigners and its respective values
 	return W, sol
 		
@@ -633,15 +650,15 @@ def find_wigner(wigner0, print_recursion=True,
 		# value from the known_3js
 		for i, wigner in enumerate(Wigners):
 			print_lll(wigner)
-			# w = float(wigner_3j(*wigner[0],*wigner[1]))
-			# e= float((w-W_values[i])/w)
+			w = float(wigner_3j(*wigner[0],*wigner[1]))
+			e= float((w-W_values[i])/w)
 			print("Calculated: " + str(W_values[i]) +
-			# "\nCorrect: " + str(w) +
-			# "\nRel. Error: " + str(e) +
+			"\nCorrect: " + str(w) +
+			"\nRel. Error: " + str(e) +
 			"\n-----------------------------------------------------")
 			pipeline.store_val_ana(np.array(wigner[0]), np.array(wigner[1]), W_values[i])
-			x.append(np.abs(wigner[1]).max())
-			# y.append(e)
+			x.append(np.abs(wigner[1]).min())
+			y.append(e)
 	recursion_count = 0 # setting back to 0
 	
 
@@ -649,29 +666,45 @@ def find_wigner(wigner0, print_recursion=True,
 if __name__=="__main__":
 
 	start = time.time()
-	feeder.feed()
-	for i in np.arange(1,11):
-		
-		wigner0 = np.array([[120,130,140],[-10*i,5*i,5*i]])
-		# wigner0 = np.array([[120,130,140],[-1,2,-1]])
-		# wigner0 = np.array([[120,130,140],[-4,3,1]])
+	t=[]
+	v=[]
+	for m1 in range(3,20,1):
+		for m2 in range(3,20,1):
+			m3=-m1-m2
+			known_3js=utils.load_all_keys()
+			wigner0 = np.array([[120,130,140],[m1,m2,m3]])
+			# wigner0 = np.array([[120,130,140],[-1,2,-1]])
+			# wigner0 = np.array([[120,130,140],[-4,3,1]])
+			if wigner0.tolist() in known_3js:
+				continue
 
-		print_recursion = False
-		print_matrices = False
-		print_results = True
+			print_recursion = False
+			print_matrices = False
+			print_results = True
 
 
-		# ===========TO-OJASWI-1=========
-		# the known_3js must be modified to receive the 
-		# (l1,l2,l3,m1,m2,m3) and its respective value.
+			# ===========TO-OJASWI-1=========
+			# the known_3js must be modified to receive the 
+			# (l1,l2,l3,m1,m2,m3) and its respective value.
 
-		known_3js=utils.load_all_keys()
-		known_3js.append(wigner0.tolist())
+			# wignerx=np.array([[120,130,140],[-10*i/2,5*i/2,5*i/2]])
+			# w = float(wigner_3j(*wignerx[0],*wignerx[1]))
+			# pipeline.store_val_ana(np.array(wignerx[0]), np.array(wignerx[1]), w)
+			known_3js.append(wigner0.tolist())
 
-		print("Calculating recursion...\n")
-		find_wigner(wigner0, print_recursion, print_matrices, print_results)
-		print(len(x))
-		end = time.time()
-		print(end - start)
+			print("Calculating recursion...\n")
+			find_wigner(wigner0, print_recursion, print_matrices, print_results)
+			print(len(x))
+			# print(x)
+			# print(y)
+			end = time.time()
+			t.append(end-start)
+			v.append(len(x))
+			print(end - start)
 
+	# df = pd.DataFrame({"mprove50_x":x, "mprove50_y":y})
+	# df.to_csv("errors.csv", index=False)
+	# df = pd.DataFrame({"mprove50_x":v, "mprove50_y":t})
+	# df.to_csv("time.csv", index=False)
+	plotter(x,y,"Mprove50","Red")
 	print("\n****************************\n")
